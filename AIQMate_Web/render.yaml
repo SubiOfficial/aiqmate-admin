@@ -9,6 +9,7 @@ services:
     name: aiqmate-admin
     runtime: node
     plan: free
+    rootDir: AIQMate_Web
     buildCommand: npm install && npm run build:render && npx prisma db push --skip-generate
     startCommand: npm run start
     envVars:
