@@ -1,0 +1,93 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+
+pool:
+  vmImage: "ubuntu-latest"
+
+variables:
+  nodeVersion: "24.x"
+
+stages:
+  - stage: Build
+    displayName: "Build and Test"
+    jobs:
+      - job: BuildAndTest
+        displayName: "Lint, Typecheck, Test, Build"
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: $(nodeVersion)
+            displayName: "Install Node.js"
+
+          - script: npm ci
+            displayName: "Install dependencies"
+
+          - script: npx prisma generate
+            displayName: "Generate Prisma client"
+
+          - script: npm run lint
+            displayName: "ESLint"
+
+          - script: npm run typecheck
+            displayName: "TypeScript check"
+
+          - script: npm test
+            displayName: "Run tests"
+
+          - script: npm run build
+            displayName: "Production build"
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              pathToPublish: "dist"
+              artifactName: "frontend"
+            displayName: "Publish frontend artifact"
+
+  - stage: Docker
+    displayName: "Docker Build"
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - job: DockerBuild
+        displayName: "Build and push Docker image"
+        steps:
+          - task: Docker@2
+            inputs:
+              command: "buildAndPush"
+              Dockerfile: "Dockerfile"
+              containerRegistry: "$(dockerRegistry)"
+              repository: "aiqmate-web"
+              tags: |
+                $(Build.BuildId)
+                latest
+            displayName: "Build and push image"
+
+  - stage: Deploy
+    displayName: "Deploy"
+    dependsOn: Docker
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: DeployToStaging
+        displayName: "Deploy to staging"
+        environment: "staging"
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: |
+                    echo "Run database migrations"
+                    npx prisma migrate deploy
+                  displayName: "Apply migrations"
+
+                - script: |
+                    echo "Deploy application"
+                    echo "Deployment steps depend on hosting provider"
+                  displayName: "Deploy application"
+
+                - script: |
+                    echo "Health check"
+                    curl -f http://localhost:3001/api/v1/web-auth/config || exit 1
+                  displayName: "Health check"

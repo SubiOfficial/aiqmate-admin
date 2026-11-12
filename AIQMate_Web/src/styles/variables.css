@@ -1,0 +1,95 @@
+/* AiQMate design tokens -- exact reference */
+
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-sub: #f9fafb;
+  --border: #e4e7ec;
+  --border-soft: #eef0f3;
+
+  --text: #101828;
+  --text-2: #475467;
+  --text-3: #98a2b3;
+
+  --accent: #1565c0;
+  --accent-soft: #eef4fc;
+
+  --badge-bg: #f2f4f7;
+  --badge-border: #e4e7ec;
+  --badge-text: #344054;
+
+  --ok: #12b76a;
+  --warn: #f79009;
+  --bad: #f04438;
+  --attention-text: #b54708;
+
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #475467;
+  --sidebar-active-bg: #eef4fc;
+  --sidebar-active-text: #1565c0;
+  --sidebar-border: #e4e7ec;
+
+  --user-avatar-bg: #fde7d9;
+  --user-avatar-text: #9a4a1c;
+
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+
+  --font: "Poppins", "Segoe UI", Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c0e12;
+    --surface: #14171c;
+    --surface-sub: #1a1e24;
+    --border: #262b33;
+    --border-soft: #1f242b;
+    --text: #f2f4f7;
+    --text-2: #a8b0bd;
+    --text-3: #6c7685;
+    --accent: #4c8df0;
+    --accent-soft: rgba(76, 141, 240, 0.14);
+    --badge-bg: #1e232a;
+    --badge-border: #2c323b;
+    --badge-text: #cfd5de;
+    --attention-text: #fdb022;
+    --sidebar-bg: #111418;
+    --sidebar-text: #a8b0bd;
+    --sidebar-active-bg: #1e232a;
+    --sidebar-active-text: #f2f4f7;
+    --sidebar-border: #22272e;
+    --user-avatar-bg: #3a2a20;
+    --user-avatar-text: #f5b58c;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0c0e12;
+  --surface: #14171c;
+  --surface-sub: #1a1e24;
+  --border: #262b33;
+  --border-soft: #1f242b;
+  --text: #f2f4f7;
+  --text-2: #a8b0bd;
+  --text-3: #6c7685;
+  --accent: #4c8df0;
+  --accent-soft: rgba(76, 141, 240, 0.14);
+  --badge-bg: #1e232a;
+  --badge-border: #2c323b;
+  --badge-text: #cfd5de;
+  --attention-text: #fdb022;
+  --sidebar-bg: #111418;
+  --sidebar-text: #a8b0bd;
+  --sidebar-active-bg: #1e232a;
+  --sidebar-active-text: #f2f4f7;
+  --sidebar-border: #22272e;
+  --user-avatar-bg: #3a2a20;
+  --user-avatar-text: #f5b58c;
+  --shadow: none;
+  color-scheme: dark;
+}

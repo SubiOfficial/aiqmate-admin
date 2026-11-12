@@ -1,0 +1,22 @@
+# Playwright MCP debug artifacts
+.playwright-mcp/
+
+# Database dumps
+*.sql
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

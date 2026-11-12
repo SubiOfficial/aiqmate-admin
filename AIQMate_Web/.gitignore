@@ -1,0 +1,14 @@
+node_modules
+dist
+*.tsbuildinfo
+.env*.local
+coverage
+
+# Local settings and secrets never leave the machine
+.env
+.env.*
+!.env.example
+
+# SQLite database (local dev)
+prisma/*.db
+prisma/*.db-journal

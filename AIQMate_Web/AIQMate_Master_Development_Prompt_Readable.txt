@@ -1,0 +1,2020 @@
+# AIQMate -- Complete End-to-End Production-Ready Multi-Tenant SaaS Architecture, Database, Backend, Frontend, Tenant-Specific Configurable Procedure Pricing, Usage-Based Billing, Payments, and Deployment
+
+## 1. ROLE AND RESPONSIBILITY
+
+Act as a Principal Software Architect, PostgreSQL Database Architect,
+Node.js Backend Engineer, React + TypeScript Developer, Multi-Tenant
+SaaS Security Engineer, Financial/Billing System Architect, Payment
+Integration Specialist, QA Automation Engineer, and DevOps Engineer.
+
+Your responsibility is to analyze, design, implement, test, document,
+and prepare my existing AIQMate application for reliable production
+deployment.
+
+This is an existing application. You must extend and improve the
+existing architecture without unnecessarily replacing, breaking, or
+duplicating existing functionality.
+
+The goal is to develop a complete, secure, scalable, maintainable,
+production-ready multi-tenant SaaS platform that supports
+tenant-specific procedure usage, independently configurable pricing
+slabs, automatic usage-based billing, invoices, payment tracking, and
+Super Admin/Tenant Admin dashboards.
+
+Do not implement a partial solution. Analyze the complete application
+and ensure the database, backend, frontend, authentication, billing, and
+deployment workflows work together end to end.
+
+------------------------------------------------------------------------
+
+## 2. EXISTING TECHNOLOGY STACK
+
+Use the following technology stack:
+
+-   Frontend: React + TypeScript
+-   Backend: Node.js + TypeScript
+-   Database: PostgreSQL
+-   Deployment: Docker
+-   CI/CD: Azure DevOps Pipelines
+-   Architecture: Multi-tenant SaaS
+-   Database model: Shared database + shared schema with tenant
+    isolation
+
+Before making any changes, identify the actual libraries, frameworks,
+ORM, authentication mechanism, database migration framework, payment
+provider, and deployment configuration currently used by the project.
+
+Do not introduce another technology or competing framework without a
+clear technical reason and approval.
+
+------------------------------------------------------------------------
+
+## 3. MOST IMPORTANT RULE -- INITIAL PROJECT ANALYSIS
+
+Before writing or modifying any code, perform a complete analysis of the
+existing project.
+
+Inspect the following:
+
+1.  Complete frontend folder structure.
+2.  Complete backend folder structure.
+3.  Existing PostgreSQL database schema.
+4.  Existing tables, columns, constraints, indexes, and relationships.
+5.  Existing database migration files and migration history.
+6.  Existing ORM or database access implementation.
+7.  Existing authentication and authorization implementation.
+8.  Existing user, tenant, and role management.
+9.  Existing procedure execution workflow.
+10. Existing procedure categories and classifications.
+11. Existing asset hierarchy and tenant relationships.
+12. Existing contact management.
+13. Existing payment implementation.
+14. Existing subscription implementation.
+15. Existing API endpoints and middleware.
+16. Existing frontend routing and dashboard implementation.
+17. Existing Docker configuration.
+18. Existing Azure DevOps pipeline configuration.
+19. Existing environment variables and secrets management.
+20. Existing tests and deployment workflow.
+
+### Important existing database tables
+
+The following tables already exist and must be carefully inspected:
+
+-   `tenants`
+-   `tenant_asset_hierarchy_levels`
+-   `assets`
+-   `contacts`
+-   `payments`
+-   `subscriptions`
+
+These are important existing tables, not a complete list of the
+database.
+
+Inspect all other existing tables as well.
+
+Do not assume the ER diagram contains every table.
+
+### Strict restrictions
+
+-   Do not delete existing tables.
+-   Do not recreate existing tables unnecessarily.
+-   Do not reset the database.
+-   Do not truncate existing data.
+-   Do not overwrite existing migrations.
+-   Do not introduce duplicate tables or functionality.
+-   Do not replace working authentication, payment, or procedure
+    execution logic unnecessarily.
+-   Do not modify existing production data during analysis.
+-   Do not make destructive changes to existing application
+    functionality.
+
+If equivalent functionality or tables already exist, extend and reuse
+them instead of creating duplicates.
+
+### Initial deliverables
+
+Before implementation, produce:
+
+1.  Existing architecture analysis.
+2.  Existing database ER diagram.
+3.  Existing table and relationship documentation.
+4.  Existing procedure execution workflow.
+5.  Existing authentication and authorization workflow.
+6.  Existing payment and subscription workflow.
+7.  Proposed multi-tenant architecture.
+8.  Proposed tenant-specific pricing architecture.
+9.  Proposed database changes.
+10. Proposed API changes.
+11. Proposed frontend changes.
+12. Migration and deployment plan.
+13. Security and data migration risk assessment.
+14. Implementation phases and test plan.
+
+Do not start modifying the project until this analysis is complete and
+the implementation plan has been presented for approval.
+
+------------------------------------------------------------------------
+
+## 4. MULTI-TENANT ARCHITECTURE
+
+Implement a secure shared-database, shared-schema multi-tenant
+architecture.
+
+Every tenant must have logically isolated data.
+
+The application must support:
+
+-   Multiple tenants.
+-   Multiple users per tenant.
+-   Users belonging to multiple tenants.
+-   Different roles for the same user in different tenants.
+-   Tenant-specific assets.
+-   Tenant-specific procedure usage.
+-   Tenant-specific procedure pricing.
+-   Tenant-specific invoices.
+-   Tenant-specific payment history.
+-   Tenant-specific subscriptions.
+-   Platform-level Super Admin management.
+
+### Tenant isolation requirements
+
+Every tenant-owned record must be associated with the correct tenant.
+
+Every tenant-scoped API must:
+
+1.  Authenticate the logged-in user.
+2.  Identify the active tenant.
+3.  Verify the user's membership in that tenant.
+4.  Validate the required role or permission.
+5.  Apply tenant filtering to all database queries.
+6.  Return only records belonging to the authorized tenant.
+
+Never trust a tenant ID supplied by the frontend without validating
+membership and authorization on the backend.
+
+Prevent:
+
+-   Cross-tenant data access.
+-   Cross-tenant record modification.
+-   Cross-tenant deletion.
+-   Cross-tenant asset relationships.
+-   Cross-tenant procedure billing.
+-   Cross-tenant invoice access.
+-   Cross-tenant payment access.
+-   Cross-tenant pricing access.
+
+Consider PostgreSQL Row-Level Security (RLS) as an additional security
+layer.
+
+If RLS is implemented, ensure tenant context is set safely for each
+transaction and connection. Account for connection pooling, transaction
+boundaries, and restricted database roles.
+
+Do not rely on frontend filtering for tenant security.
+
+------------------------------------------------------------------------
+
+## 5. USER, ROLE, PERMISSION AND MEMBERSHIP MANAGEMENT
+
+Inspect existing authentication and authorization tables first.
+
+If equivalent structures do not exist, introduce the required
+structures.
+
+The system should support the following logical entities:
+
+-   Users
+-   Roles
+-   Permissions
+-   Tenant memberships
+-   Membership-role assignments
+-   Role-permission assignments
+-   Platform-level Super Admin access
+
+### Roles
+
+Support at least:
+
+**Platform SUPER_ADMIN**
+
+-   Manages the entire SaaS platform.
+-   Creates and manages tenants.
+-   Manages tenant-specific pricing.
+-   Views platform-level metrics.
+-   Manages billing configurations.
+-   Views tenant billing and payment status.
+-   Manages platform-level settings.
+
+**TENANT_ADMIN**
+
+-   Manages users within their tenant.
+-   Views their tenant's assets and procedure usage.
+-   Views applicable pricing slabs.
+-   Views estimated charges.
+-   Views invoices and payment history.
+-   Views subscription information.
+-   Cannot access other tenants.
+-   Cannot change pricing unless explicitly granted permission.
+
+**TENANT_USER**
+
+-   Accesses permitted tenant resources.
+-   Executes authorized procedures.
+-   Views permitted usage information.
+
+Roles must be reusable and permission-driven rather than hardcoded
+throughout the application.
+
+A user can belong to multiple tenants and have different roles in each
+tenant.
+
+A platform SUPER_ADMIN must be separate from ordinary tenant membership
+permissions.
+
+------------------------------------------------------------------------
+
+## 6. EXISTING ASSET, HIERARCHY AND CONTACT MANAGEMENT
+
+Preserve the existing asset and hierarchy functionality.
+
+Inspect:
+
+-   `tenant_asset_hierarchy_levels`
+-   `assets`
+-   `contacts`
+-   All associated relationships.
+
+Support tenant-specific configurable asset hierarchy levels.
+
+Do not assume every tenant uses the same hierarchy.
+
+For example, different tenants may have different asset structures and
+levels.
+
+Requirements:
+
+-   Each asset must belong to its correct tenant.
+-   Parent and child assets must belong to the same tenant.
+-   Hierarchy changes must preserve existing relationships.
+-   Validate hierarchy depth and parent-child relationships.
+-   Prevent circular asset relationships.
+-   Prevent cross-tenant asset relationships.
+-   Preserve existing asset information.
+
+### Contact management
+
+Keep contact designation separate from application roles.
+
+A contact designation such as Manager, Engineer, or Supervisor must not
+automatically grant application permissions.
+
+Maintain the existing contact functionality and extend it only when
+required.
+
+------------------------------------------------------------------------
+
+## 7. TENANT-SPECIFIC CONFIGURABLE PROCEDURE PRICING
+
+### 7.1 Mandatory business requirement
+
+This is one of the most important requirements of the entire
+application.
+
+**Procedure pricing must be independently configurable for every
+tenant.**
+
+There must be:
+
+-   No fixed pricing slabs.
+-   No globally hardcoded procedure rates.
+-   No assumption that all tenants use the same pricing.
+-   No mandatory standard procedure count ranges.
+-   No silent global fallback pricing.
+
+Each tenant must have its own pricing configuration.
+
+For example:
+
+-   Tenant A may configure 1--100 procedures at one price and 101--500
+    at another price.
+-   Tenant B may configure 1--50 procedures at a different price and
+    51--200 at another price.
+-   Tenant C may configure completely different slabs, prices,
+    currencies, and billing periods.
+
+These are examples only. They must never be hardcoded into the
+application.
+
+### 7.2 Super Admin pricing configuration UI
+
+Create a dedicated pricing management interface.
+
+Navigation:
+
+**Super Admin Dashboard → Tenant Management → Select Tenant → Procedure
+Pricing → Usage Slabs**
+
+The Super Admin must be able to:
+
+1.  Select a tenant.
+2.  View that tenant's existing pricing configuration.
+3.  Create a new pricing configuration.
+4.  Select a procedure type or category.
+5.  Configure pricing for all procedures or a selected category.
+6.  Add any number of pricing slabs.
+7.  Set minimum procedure count.
+8.  Set maximum procedure count.
+9.  Set price per procedure.
+10. Select the currency.
+11. Select the billing period.
+12. Select the pricing calculation method.
+13. Configure effective start and end dates.
+14. Activate or deactivate a pricing configuration.
+15. Schedule future pricing changes.
+16. Edit future pricing configurations.
+17. View historical pricing configurations.
+18. Preview the calculated billing amount before activation.
+
+Do not impose an arbitrary maximum number of slabs unless there is a
+justified technical limit.
+
+### 7.3 Configurable pricing calculation methods
+
+Support two pricing calculation methods.
+
+Both must be configurable per tenant and pricing configuration.
+
+#### Method A: Graduated / Tiered Pricing
+
+Each slab's rate applies only to the procedures within that slab.
+
+Illustrative example:
+
+  Procedure range     Rate per procedure
+  ----------------- --------------------
+  1--100                          \$2.00
+  101--500                        \$1.75
+  501--1,000                      \$1.50
+  1,001 onward                    \$1.25
+
+If a tenant uses 600 billable procedures:
+
+-   First 100 × \$2.00 = \$200
+-   Next 400 × \$1.75 = \$700
+-   Next 100 × \$1.50 = \$150
+
+Total = \$1,050.
+
+These ranges and amounts are illustrative only.
+
+#### Method B: Volume Pricing
+
+When total usage reaches a configured slab, that slab's unit price
+applies to all eligible procedures in the billing period.
+
+Using the same illustrative ranges, if 600 procedures are used:
+
+-   Applicable slab rate = \$1.50.
+-   600 × \$1.50 = \$900.
+
+The UI must clearly explain the difference between Graduated/Tiered and
+Volume Pricing.
+
+Do not silently switch calculation methods.
+
+### Pricing configuration rules
+
+-   Each tenant can use a different calculation method.
+-   Different procedure categories may use different configurations.
+-   Pricing must be resolved using the correct tenant, procedure
+    category, billing period, and effective date.
+-   Prevent overlapping active pricing configurations for the same scope
+    and period.
+-   Prevent invalid or overlapping slab ranges.
+-   Validate gaps in slab coverage according to the configured pricing
+    rules.
+-   If usage exceeds the highest configured slab and no applicable rate
+    exists, return a clear pricing configuration error.
+-   Never silently use another tenant's pricing or a global default.
+
+### 7.4 Pricing preview and calculator
+
+Provide a live pricing preview inside the Super Admin pricing
+configuration page.
+
+Display:
+
+-   Selected tenant.
+-   Procedure category.
+-   Billing period.
+-   Pricing calculation method.
+-   Configured slabs.
+-   Sample procedure count.
+-   Applicable slab or slabs.
+-   Price per procedure.
+-   Estimated total amount.
+-   Currency.
+-   Detailed calculation breakdown.
+
+Include a test calculator so the Super Admin can enter any sample
+procedure count and see the expected charge before saving or activating
+the configuration.
+
+The preview must use the same calculation logic as the backend billing
+engine.
+
+The frontend preview is informational. The backend remains
+authoritative.
+
+### 7.5 Tenant-specific pricing isolation
+
+Tenant A's pricing must never affect Tenant B or Tenant C.
+
+For example:
+
+-   Tenant A may have 4 pricing slabs.
+-   Tenant B may have 2 pricing slabs.
+-   Tenant C may have 6 pricing slabs.
+-   Each tenant may use a different currency.
+-   Each tenant may use a different billing period.
+-   Each tenant may select a different calculation method.
+
+All configurations must be database-driven.
+
+Adding a tenant or changing its pricing must not require code changes or
+application redeployment.
+
+### 7.6 Tenant Admin pricing visibility
+
+In the Tenant Admin dashboard, create a Procedure Usage and Pricing
+section.
+
+Display:
+
+-   Total procedures executed.
+-   Total eligible billable procedures.
+-   Non-billable procedure count.
+-   Current billing period.
+-   Applicable pricing configuration.
+-   Current applicable slab.
+-   Price per procedure.
+-   Estimated billing amount.
+-   Remaining procedures before reaching the next slab, where
+    applicable.
+-   Detailed calculation breakdown.
+-   Previous billing periods.
+-   Previous invoices.
+-   Historical charges.
+
+Tenant Admin must only see information belonging to their own tenant.
+
+Tenant Admin must not modify pricing unless explicitly authorized.
+
+### 7.7 Database design for configurable pricing
+
+First inspect the existing database.
+
+Create or extend the following logical structures only when equivalent
+functionality does not already exist:
+
+**Tenant pricing configuration**
+
+Possible table: `tenant_procedure_pricing`
+
+Suggested fields:
+
+-   id
+-   tenant_id
+-   procedure_type_id or procedure_category_id, where applicable
+-   pricing_scope
+-   pricing_model
+-   billing_period
+-   currency
+-   effective_from
+-   effective_to
+-   status
+-   created_by
+-   updated_by
+-   created_at
+-   updated_at
+
+**Pricing slabs**
+
+Possible table: `tenant_procedure_pricing_tiers`
+
+Suggested fields:
+
+-   id
+-   pricing_configuration_id
+-   minimum_quantity
+-   maximum_quantity (nullable for an open-ended final slab)
+-   unit_rate
+-   tier_order
+-   created_at
+-   updated_at
+
+Use appropriate foreign keys and indexes.
+
+Add database constraints or transactional validation to prevent:
+
+-   Invalid quantity ranges.
+-   Negative rates.
+-   Duplicate slab definitions.
+-   Overlapping slab ranges.
+-   Conflicting active pricing configurations.
+-   Cross-tenant pricing references.
+
+Use `NUMERIC` or `DECIMAL` for financial values.
+
+Never use PostgreSQL FLOAT or DOUBLE PRECISION for authoritative
+financial amounts.
+
+Do not blindly create these exact tables if the current schema already
+provides equivalent structures. Reuse and extend the existing database
+design.
+
+### 7.8 Pricing history and immutability
+
+Whenever pricing changes:
+
+-   Preserve the previous configuration.
+-   Record who changed the pricing.
+-   Record when the change occurred.
+-   Maintain effective dates.
+-   Do not modify historical invoice amounts.
+-   Do not recalculate previously billed usage using new rates.
+
+For every billable usage record, preserve a pricing snapshot containing:
+
+-   Tenant ID.
+-   Procedure type/category.
+-   Pricing configuration ID.
+-   Pricing model.
+-   Applied slab or slabs.
+-   Applied unit rate.
+-   Quantity.
+-   Currency.
+-   Calculated amount.
+-   Billing period.
+-   Pricing effective date.
+
+Historical billing must remain reproducible and auditable.
+
+------------------------------------------------------------------------
+
+## 8. PROCEDURE EXECUTION AND USAGE TRACKING
+
+Inspect the existing procedure execution implementation before making
+any changes.
+
+Do not create a second procedure execution workflow.
+
+Integrate usage tracking into the existing execution lifecycle.
+
+Whenever an authorized user executes a procedure, record the execution
+using the existing workflow.
+
+Track the following logical information:
+
+-   Execution ID.
+-   Tenant ID.
+-   User ID.
+-   Procedure ID or type.
+-   Procedure category.
+-   Execution status.
+-   Started timestamp.
+-   Completed timestamp.
+-   Failed timestamp, where applicable.
+-   Billing period.
+-   Billable eligibility.
+-   Idempotency key.
+-   Pricing snapshot, when billing is applied.
+-   Quantity.
+-   Currency.
+-   Calculated amount.
+-   Related invoice item, when invoiced.
+
+Use execution statuses such as:
+
+-   PENDING
+-   IN_PROGRESS
+-   COMPLETED
+-   FAILED
+-   CANCELLED
+
+### Billing eligibility
+
+Only procedures that meet the configured billing eligibility rules
+should be billed.
+
+By default, bill only eligible completed executions.
+
+If the existing business rules explicitly support billing another
+execution status, document and implement that rule deliberately.
+
+Do not bill:
+
+-   Failed executions unless explicitly configured.
+-   Cancelled executions unless explicitly configured.
+-   Duplicate executions caused by retries.
+-   Repeated page refreshes.
+-   Repeated frontend requests for the same execution.
+-   Ineligible test or administrative operations.
+
+### Idempotency
+
+Implement idempotency at the appropriate execution and billing
+boundaries.
+
+Use database constraints and transactions to prevent duplicate usage
+records and duplicate charges.
+
+A retried request must not create another billable procedure or invoice
+item for the same underlying execution.
+
+Keep actual execution counts separate from billable procedure counts.
+
+------------------------------------------------------------------------
+
+## 9. AUTOMATIC USAGE CALCULATION AND BILLING ENGINE
+
+Build a reliable backend billing engine integrated with procedure
+execution.
+
+The billing engine must:
+
+1.  Identify the tenant.
+2.  Identify the correct procedure and category.
+3.  Identify the billing period.
+4.  Retrieve the tenant's applicable pricing configuration.
+5.  Validate its effective dates and status.
+6.  Count eligible billable procedure executions.
+7.  Apply the configured pricing calculation method.
+8.  Resolve the applicable pricing slabs.
+9.  Calculate the amount using exact decimal arithmetic.
+10. Save the usage and pricing snapshot.
+11. Generate the appropriate billing records.
+12. Prevent duplicate charges.
+13. Maintain audit history.
+
+### Billing calculation requirements
+
+Support both:
+
+-   Graduated/Tiered Pricing.
+-   Volume Pricing.
+
+Use a single authoritative backend pricing calculation service.
+
+Do not duplicate calculation logic in multiple controllers or frontend
+components.
+
+The pricing service must be reusable by:
+
+-   Live pricing preview APIs.
+-   Usage calculation.
+-   Invoice generation.
+-   Billing history.
+-   Automated billing jobs.
+
+The backend must return a detailed calculation breakdown.
+
+### Billing period
+
+Support configurable billing periods, including monthly or other
+explicitly configured periods.
+
+Do not assume every tenant must use the same billing period.
+
+Handle:
+
+-   Period start and end.
+-   Time zones.
+-   Month boundaries.
+-   Late-arriving execution records.
+-   Failed background jobs.
+-   Repeated billing job execution.
+-   Billing period closing.
+-   Corrections and adjustments.
+
+Use a consistent, documented billing timezone policy.
+
+### Missing pricing
+
+If pricing is not configured:
+
+-   Return `PRICING_NOT_CONFIGURED`.
+-   Do not silently apply a default rate.
+-   Do not generate an incorrect invoice.
+-   Record the configuration problem for administrative review.
+
+If a usage quantity falls outside all configured slabs, return a clear
+pricing coverage error and prevent incorrect billing.
+
+### Billing adjustments
+
+Any manual usage or billing adjustment must:
+
+-   Require explicit authorization.
+-   Record the reason.
+-   Record the user who performed it.
+-   Preserve the original usage record.
+-   Create an auditable adjustment entry.
+-   Preserve finalized invoice history.
+
+Never silently modify previously billed usage.
+
+------------------------------------------------------------------------
+
+## 10. INVOICE MANAGEMENT
+
+Inspect the existing invoice or billing implementation first.
+
+If an equivalent invoice system does not exist, implement an invoice
+management module.
+
+The logical data model should support:
+
+-   Invoices.
+-   Invoice items.
+-   Usage references.
+-   Pricing snapshots.
+-   Billing periods.
+-   Payment allocations.
+-   Credits or adjustments, where needed.
+
+### Invoice information
+
+Each invoice must include:
+
+-   Unique invoice number.
+-   Tenant information.
+-   Billing period.
+-   Invoice creation date.
+-   Due date.
+-   Currency.
+-   Procedure category.
+-   Total billable procedures.
+-   Applicable pricing slabs.
+-   Rate per slab.
+-   Quantity per slab.
+-   Subtotal.
+-   Taxes, if configured.
+-   Discounts, if explicitly configured.
+-   Adjustments.
+-   Final total.
+-   Amount paid.
+-   Outstanding balance.
+-   Invoice status.
+
+### Invoice calculation
+
+For graduated pricing, display each slab's separate quantity, rate, and
+amount.
+
+For volume pricing, clearly display the total quantity and the
+applicable volume rate.
+
+The invoice must show how the final amount was calculated.
+
+### Invoice statuses
+
+Support suitable statuses such as:
+
+-   DRAFT
+-   OPEN
+-   PARTIALLY_PAID
+-   PAID
+-   OVERDUE
+-   VOID
+-   UNCOLLECTIBLE, if required
+
+### Invoice integrity
+
+-   Prevent duplicate invoices for the same tenant and billing period.
+-   Finalized invoices must be immutable.
+-   Corrections must use credit notes or adjustment records.
+-   Preserve invoice history.
+-   Maintain a traceable relationship between invoices and billable
+    usage.
+-   Never modify historical invoice totals when pricing changes.
+
+Do not claim an invoice is paid merely because it was generated.
+
+------------------------------------------------------------------------
+
+## 11. PAYMENT INTEGRATION
+
+Inspect the existing payment integration.
+
+Reuse the existing payment provider and payment workflow.
+
+Do not introduce another payment provider without approval.
+
+Support:
+
+-   Invoice payment.
+-   Payment initiation.
+-   Payment confirmation.
+-   Payment failure.
+-   Payment retry.
+-   Refunds.
+-   Payment history.
+-   Webhook processing.
+-   Payment reconciliation.
+
+### Payment security
+
+-   Verify payment provider webhook signatures.
+-   Validate payment status using trusted provider responses.
+-   Never trust frontend payment success messages.
+-   Store provider transaction identifiers.
+-   Deduplicate webhook events.
+-   Make webhook processing idempotent.
+-   Record payment failures.
+-   Prevent duplicate payment allocations.
+-   Secure all payment endpoints.
+
+Keep these financial concepts separate:
+
+1.  Total billed revenue.
+2.  Total collected revenue.
+3.  Outstanding revenue.
+4.  Refunded revenue.
+5.  Failed payments.
+
+A partially paid invoice must show the actual amount paid and remaining
+outstanding amount.
+
+Never treat invoice generation as payment collection.
+
+------------------------------------------------------------------------
+
+## 12. SUBSCRIPTION MANAGEMENT
+
+Preserve the existing `subscriptions` table and existing subscription
+functionality.
+
+Inspect the current subscription model before extending it.
+
+Support configurable subscription models.
+
+Possible models:
+
+-   Usage-based billing.
+-   Fixed recurring subscription.
+-   Hybrid subscription plus usage-based billing.
+
+The platform must not assume that every tenant uses the same
+subscription model.
+
+Support:
+
+-   Subscription status.
+-   Subscription start date.
+-   Renewal date.
+-   Expiry date.
+-   Billing frequency.
+-   Configured plan.
+-   Included usage allowance, if applicable.
+-   Additional usage charges, if applicable.
+-   Cancellation.
+-   Renewal.
+-   Upgrade and downgrade.
+-   Payment status.
+
+Usage-based billing must remain the primary model unless a tenant's
+configuration explicitly defines a hybrid or fixed subscription model.
+
+Preserve subscription history.
+
+Do not delete previous subscription records when plans change.
+
+------------------------------------------------------------------------
+
+## 13. SUPER ADMIN DASHBOARD
+
+Create or extend a comprehensive Super Admin dashboard.
+
+The dashboard must retrieve actual information from the backend and
+database.
+
+Do not use hardcoded statistics or placeholder business metrics in
+production.
+
+### Main dashboard metrics
+
+Display:
+
+-   Total tenants.
+-   Active tenants.
+-   Inactive tenants.
+-   Total users.
+-   Total procedure executions.
+-   Total billable procedures.
+-   Total billed revenue.
+-   Total collected revenue.
+-   Outstanding revenue.
+-   Refunded revenue.
+-   Active subscriptions.
+-   Expired subscriptions.
+-   Pending payments.
+-   Failed payments.
+
+### Tenant management
+
+Provide:
+
+-   Tenant listing.
+-   Tenant search.
+-   Pagination.
+-   Tenant details.
+-   Tenant status.
+-   Tenant users.
+-   Tenant assets.
+-   Procedure usage.
+-   Pricing configuration.
+-   Billing history.
+-   Invoices.
+-   Payments.
+-   Subscription details.
+
+### Pricing management
+
+The Super Admin must be able to open an individual tenant and manage
+that tenant's procedure pricing independently.
+
+Provide:
+
+-   Pricing configurations.
+-   Pricing slabs.
+-   Calculation method.
+-   Effective dates.
+-   Currency.
+-   Billing period.
+-   Pricing preview.
+-   Pricing history.
+-   Configuration validation.
+-   Activation and deactivation.
+
+### Platform monitoring
+
+Show billing configuration errors, failed billing jobs, payment webhook
+errors, and other operational issues with suitable filtering and audit
+information.
+
+------------------------------------------------------------------------
+
+## 14. TENANT ADMIN DASHBOARD
+
+Create or extend the Tenant Admin dashboard.
+
+All data must be restricted to the authenticated tenant.
+
+### Dashboard metrics
+
+Display:
+
+-   Total procedure executions.
+-   Completed procedures.
+-   Failed procedures.
+-   Billable procedures.
+-   Non-billable procedures.
+-   Current billing period.
+-   Estimated charges.
+-   Total billed amount.
+-   Total paid amount.
+-   Outstanding balance.
+-   Next billing date, where applicable.
+
+### Procedure usage and pricing page
+
+Display:
+
+-   Tenant-specific configured pricing.
+-   Procedure categories.
+-   Configured pricing slabs.
+-   Pricing calculation method.
+-   Current usage.
+-   Applicable slab.
+-   Rate per procedure.
+-   Estimated amount.
+-   Next slab information.
+-   Remaining quantity to next slab, where applicable.
+-   Detailed calculation breakdown.
+
+### Billing page
+
+Display:
+
+-   Invoice list.
+-   Invoice details.
+-   Invoice status.
+-   Amount paid.
+-   Outstanding balance.
+-   Payment history.
+-   Refund history, if applicable.
+-   Billing period.
+-   Downloadable invoice, if supported.
+
+### Subscription page
+
+Display:
+
+-   Current subscription.
+-   Subscription status.
+-   Start and expiry dates.
+-   Renewal date.
+-   Billing model.
+-   Included usage, if configured.
+-   Additional usage charges, if applicable.
+
+Tenant Admin must never see another tenant's information.
+
+------------------------------------------------------------------------
+
+## 15. BACKEND API ARCHITECTURE
+
+Inspect the existing API conventions and reuse them.
+
+Do not introduce duplicate endpoints or inconsistent naming conventions.
+
+Create or extend API groups for the following capabilities.
+
+### Authentication and tenant context
+
+-   Login and authentication.
+-   User profile.
+-   Tenant memberships.
+-   Active tenant selection.
+-   Tenant membership validation.
+
+### Tenant management
+
+-   Create tenant.
+-   Update tenant.
+-   List tenants.
+-   Retrieve tenant details.
+-   Activate or deactivate tenant.
+
+Restrict platform-wide operations to authorized Super Admin users.
+
+### User and permission management
+
+-   Create users.
+-   Update users.
+-   Assign tenant memberships.
+-   Assign roles.
+-   Manage permissions.
+-   Retrieve current user permissions.
+
+### Procedure usage
+
+-   Record execution.
+-   Update execution status.
+-   Retrieve tenant usage.
+-   Retrieve usage by procedure category.
+-   Retrieve usage by billing period.
+-   Retrieve billable and non-billable counts.
+
+### Pricing management
+
+-   Create tenant pricing configuration.
+-   Update pricing configuration.
+-   Add pricing slabs.
+-   Update pricing slabs.
+-   Deactivate pricing configuration.
+-   Schedule pricing changes.
+-   Retrieve pricing history.
+-   Preview pricing.
+-   Calculate sample usage.
+
+### Billing
+
+-   Calculate billable usage.
+-   Retrieve billing summary.
+-   Generate invoice.
+-   Retrieve invoice list.
+-   Retrieve invoice details.
+-   Record adjustments.
+-   Retrieve billing history.
+
+### Payments
+
+-   Initiate payment.
+-   Retrieve payment status.
+-   Retrieve payment history.
+-   Process payment webhook.
+-   Process refund where supported.
+
+### Subscriptions
+
+-   Retrieve subscription.
+-   Create or update subscription.
+-   Cancel subscription.
+-   Renew subscription.
+-   Retrieve subscription history.
+
+### API requirements
+
+Every API must include:
+
+-   Authentication.
+-   Authorization.
+-   Tenant validation.
+-   Input validation.
+-   Appropriate error handling.
+-   Consistent response structure.
+-   Audit logging where required.
+-   Pagination for large collections.
+-   Appropriate database transactions.
+
+Do not expose internal database errors, secrets, stack traces, or
+sensitive information in API responses.
+
+------------------------------------------------------------------------
+
+## 16. FRONTEND DEVELOPMENT -- REACT + TYPESCRIPT
+
+Inspect the existing React application and preserve its existing design
+system, component patterns, and routing conventions.
+
+Implement or extend the following pages:
+
+### Super Admin
+
+-   Dashboard.
+-   Tenant management.
+-   Tenant details.
+-   User management.
+-   Role and permission management.
+-   Procedure pricing configuration.
+-   Usage slab editor.
+-   Pricing preview calculator.
+-   Pricing history.
+-   Usage monitoring.
+-   Invoice management.
+-   Payment management.
+-   Subscription management.
+-   Audit log.
+-   System configuration.
+
+### Tenant Admin
+
+-   Dashboard.
+-   User management.
+-   Asset management.
+-   Procedure usage.
+-   Configured pricing slabs.
+-   Pricing breakdown.
+-   Billing history.
+-   Invoice details.
+-   Payment history.
+-   Subscription information.
+
+### UI and UX requirements
+
+-   Responsive design.
+-   Consistent typography.
+-   Professional SaaS dashboard layout.
+-   Clear navigation.
+-   Accessible form controls.
+-   Appropriate loading states.
+-   Empty states.
+-   Validation messages.
+-   Error handling.
+-   Confirmation dialogs for important operations.
+-   Success notifications.
+-   Pagination.
+-   Search and filters.
+-   No unnecessary duplicate screens.
+
+### Pricing configuration UI
+
+The pricing editor must dynamically support adding and removing pricing
+slabs.
+
+Do not hardcode the number of slabs.
+
+Provide appropriate validation for:
+
+-   Minimum and maximum quantity.
+-   Rate.
+-   Currency.
+-   Calculation method.
+-   Billing period.
+-   Effective dates.
+-   Overlapping ranges.
+-   Missing ranges.
+-   Invalid pricing configuration.
+
+Display a clear preview before activating a pricing configuration.
+
+The frontend must not be the authoritative source for financial
+calculations.
+
+All authoritative prices and billing totals must come from the backend.
+
+------------------------------------------------------------------------
+
+## 17. DATABASE DESIGN AND MIGRATIONS
+
+Use the existing database architecture and migration framework.
+
+Do not introduce another migration framework if one already exists.
+
+If the project does not have an ORM or migration solution, evaluate an
+appropriate option, including Prisma where justified, and obtain
+approval before introducing it.
+
+### Database design requirements
+
+Inspect and document:
+
+-   Existing tables.
+-   New required tables.
+-   Modified tables.
+-   Foreign keys.
+-   Unique constraints.
+-   Check constraints.
+-   Indexes.
+-   Tenant relationships.
+-   Billing relationships.
+-   Pricing relationships.
+-   Historical records.
+
+Use proper normalization without unnecessary fragmentation.
+
+Use:
+
+-   UUID or the existing primary key convention.
+-   Foreign keys.
+-   Unique constraints.
+-   Check constraints.
+-   Tenant-aware indexes.
+-   Transactional updates.
+-   Exact decimal data types for financial amounts.
+
+### Migration requirements
+
+-   Use version-controlled migrations.
+-   Never modify already-applied migrations.
+-   Create new migrations for schema changes.
+-   Follow safe expand-and-contract migration practices.
+-   Preserve existing data.
+-   Test migrations against a copy of the database.
+-   Validate rollback or forward-recovery procedures.
+-   Prevent multiple deployment agents from running migrations
+    concurrently.
+-   Separate development, staging, and production configurations.
+
+Never run destructive database commands against production.
+
+Do not use database reset or schema push commands as a substitute for
+safe production migrations.
+
+------------------------------------------------------------------------
+
+## 18. FINANCIAL ACCURACY AND DATA INTEGRITY
+
+Financial calculations must be consistent across the backend, database,
+invoices, and dashboards.
+
+Mandatory requirements:
+
+-   Use PostgreSQL `NUMERIC` or `DECIMAL`.
+-   Use a decimal arithmetic library in Node.js where appropriate.
+-   Never use JavaScript floating-point arithmetic as the authoritative
+    financial calculation.
+-   Define currency precision and rounding rules.
+-   Store the currency with each relevant financial record.
+-   Preserve pricing snapshots.
+-   Prevent duplicate usage charges.
+-   Prevent duplicate invoices.
+-   Prevent duplicate payment allocations.
+-   Use database transactions for related financial operations.
+-   Maintain traceable audit records.
+
+The same calculation must produce the same result across pricing
+preview, usage billing, and invoice generation.
+
+------------------------------------------------------------------------
+
+## 19. AUDIT LOGGING AND MONITORING
+
+Implement audit logging or extend existing audit functionality.
+
+Record important events involving:
+
+-   Tenant creation and modification.
+-   Tenant membership changes.
+-   Role and permission changes.
+-   Pricing configuration changes.
+-   Pricing slab changes.
+-   Procedure execution.
+-   Usage adjustments.
+-   Invoice generation.
+-   Invoice adjustments.
+-   Payment events.
+-   Refunds.
+-   Subscription changes.
+-   Super Admin actions.
+
+Each audit record should capture relevant information such as:
+
+-   Tenant ID.
+-   Acting user ID.
+-   Action.
+-   Entity type.
+-   Entity ID.
+-   Timestamp.
+-   Relevant before-and-after values, where appropriate.
+-   Reason, where required.
+
+Never log:
+
+-   Passwords.
+-   Authentication tokens.
+-   Payment secrets.
+-   API secrets.
+-   Sensitive credentials.
+
+Add suitable application logging and monitoring for:
+
+-   API failures.
+-   Database failures.
+-   Billing job failures.
+-   Payment webhook failures.
+-   Pricing configuration errors.
+-   Migration failures.
+-   Background job failures.
+
+------------------------------------------------------------------------
+
+## 20. SECURITY REQUIREMENTS
+
+Implement production-grade security.
+
+Mandatory controls:
+
+-   Secure authentication.
+-   Authorization middleware.
+-   Tenant membership validation.
+-   Tenant-scoped database access.
+-   Input validation.
+-   SQL injection protection.
+-   Rate limiting where appropriate.
+-   Secure password handling.
+-   Secure session/token handling.
+-   CORS configuration.
+-   Secrets management.
+-   Payment webhook signature verification.
+-   API permission checks.
+-   Audit logging.
+-   Appropriate error handling.
+
+Never rely on frontend role checks as the only authorization control.
+
+Never expose sensitive environment variables or payment secrets to the
+frontend.
+
+Ensure Super Admin APIs are protected against tenant-level users.
+
+Perform cross-tenant access testing for every tenant-owned resource.
+
+------------------------------------------------------------------------
+
+## 21. PERFORMANCE AND SCALABILITY
+
+Prepare the application for increasing tenant and usage volumes.
+
+Requirements:
+
+-   Tenant-aware database indexes.
+-   Appropriate foreign key indexes.
+-   Efficient aggregation queries.
+-   Pagination.
+-   Avoid unnecessary N+1 queries.
+-   Connection pooling.
+-   Efficient database transactions.
+-   Background processing for suitable billing operations.
+-   Idempotent scheduled jobs.
+-   Proper API timeouts.
+-   Appropriate caching only where data consistency permits.
+
+Do not introduce complex partitioning or archiving until actual usage
+volumes justify it.
+
+Ensure dashboard calculations do not require scanning unnecessary
+historical records on every request.
+
+------------------------------------------------------------------------
+
+## 22. TESTING AND QUALITY ASSURANCE
+
+Do not consider the development complete until all major workflows have
+been tested.
+
+### Database testing
+
+-   Existing schema compatibility.
+-   Migration execution.
+-   Foreign key constraints.
+-   Unique constraints.
+-   Tenant relationships.
+-   Pricing slab validation.
+-   Financial precision.
+-   Historical snapshot integrity.
+
+### Multi-tenant security testing
+
+Create multiple test tenants.
+
+Verify:
+
+-   Tenant A cannot access Tenant B data.
+-   Tenant A cannot modify Tenant B data.
+-   Tenant A cannot view Tenant B pricing.
+-   Tenant A cannot access Tenant B invoices.
+-   Tenant A cannot access Tenant B payments.
+-   Tenant A cannot execute unauthorized operations.
+-   Users with multiple tenant memberships receive only the active
+    tenant's authorized data.
+
+### Role testing
+
+Verify:
+
+-   SUPER_ADMIN access.
+-   TENANT_ADMIN access.
+-   TENANT_USER access.
+-   Cross-tenant membership roles.
+-   Permission restrictions.
+-   Unauthorized API requests.
+
+### Pricing testing
+
+Test:
+
+-   Different slab counts for different tenants.
+-   Different procedure categories.
+-   Different currencies.
+-   Different billing periods.
+-   Different calculation methods.
+-   Graduated/Tiered calculations.
+-   Volume calculations.
+-   Effective date changes.
+-   Historical pricing preservation.
+-   Overlapping slab rejection.
+-   Missing pricing.
+-   Usage beyond the configured maximum.
+-   Pricing preview and backend calculation consistency.
+
+Use configurable test fixtures rather than hardcoding pricing
+assumptions into production logic.
+
+### Procedure execution testing
+
+Test:
+
+-   Successful execution.
+-   Failed execution.
+-   Cancelled execution.
+-   Retry.
+-   Duplicate request.
+-   Idempotency.
+-   Billable eligibility.
+-   Non-billable execution.
+-   Correct tenant association.
+
+### Billing and invoice testing
+
+Test:
+
+-   Correct usage aggregation.
+-   Correct slab selection.
+-   Correct amount calculation.
+-   Duplicate billing prevention.
+-   Duplicate invoice prevention.
+-   Invoice breakdown.
+-   Partial payment.
+-   Full payment.
+-   Outstanding amount.
+-   Refund.
+-   Historical invoice immutability.
+-   Billing period boundaries.
+
+### Payment testing
+
+Test:
+
+-   Successful payment.
+-   Failed payment.
+-   Duplicate webhook.
+-   Invalid webhook signature.
+-   Payment retry.
+-   Refund.
+-   Payment reconciliation.
+
+### Frontend testing
+
+Test:
+
+-   Super Admin dashboard.
+-   Tenant selection.
+-   Pricing editor.
+-   Dynamic slab addition/removal.
+-   Pricing preview.
+-   Tenant Admin dashboard.
+-   Usage display.
+-   Invoice display.
+-   Role-based access.
+-   Loading and error states.
+-   Responsive layout.
+
+### End-to-end testing
+
+Test the complete workflow:
+
+1.  Super Admin logs in.
+2.  Super Admin creates a tenant.
+3.  Super Admin configures tenant users and permissions.
+4.  Super Admin configures that tenant's procedure pricing.
+5.  Tenant Admin logs in.
+6.  Tenant Admin views the configured pricing.
+7.  A tenant user executes procedures.
+8.  The backend records executions.
+9.  The billing engine identifies eligible usage.
+10. The billing engine applies the tenant's pricing slabs.
+11. The system calculates the charge.
+12. The system generates an invoice.
+13. The tenant makes a payment.
+14. The payment provider confirms the payment.
+15. The backend processes the verified webhook.
+16. The invoice payment status is updated.
+17. The Super Admin dashboard reflects the actual financial metrics.
+18. The Tenant Admin dashboard displays only that tenant's billing
+    information.
+
+Also test the same workflow with tenants using completely different
+pricing configurations.
+
+------------------------------------------------------------------------
+
+## 23. DOCKER AND AZURE DEVOPS DEPLOYMENT
+
+Inspect the existing Docker and Azure DevOps configuration.
+
+Preserve existing working pipeline conventions.
+
+Prepare a safe, repeatable deployment process.
+
+### Docker
+
+Ensure:
+
+-   Frontend and backend build correctly.
+-   Production dependencies are installed correctly.
+-   Secrets are not embedded in images.
+-   Environment-specific configuration is supported.
+-   Containers expose appropriate health checks.
+-   Containers run with appropriate security restrictions.
+-   Database connections are configured securely.
+
+### Azure DevOps pipeline
+
+The pipeline should include:
+
+1.  Source checkout.
+2.  Dependency installation.
+3.  Code formatting and linting.
+4.  TypeScript validation.
+5.  Unit tests.
+6.  Integration tests.
+7.  Security checks.
+8.  Frontend production build.
+9.  Backend production build.
+10. Docker image build.
+11. Image tagging.
+12. Migration validation.
+13. Approved database backup.
+14. Database migration execution.
+15. Backend deployment.
+16. Frontend deployment.
+17. Health checks.
+18. Smoke tests.
+19. Deployment result reporting.
+
+### Deployment safety
+
+-   Keep development, staging, and production configurations separate.
+-   Use Azure-managed secret storage or the existing approved
+    secret-management solution.
+-   Never commit production secrets.
+-   Do not run destructive migrations automatically.
+-   Prevent concurrent migration execution.
+-   Verify the database backup before production schema changes.
+-   Ensure the application can operate safely during compatible
+    expand-and-contract migrations.
+-   Define a recovery strategy for failed deployments.
+
+Do not claim a deployment succeeded unless the actual pipeline and
+health checks confirm it.
+
+------------------------------------------------------------------------
+
+## 24. ENVIRONMENT CONFIGURATION
+
+Inspect the existing configuration and extend it without duplicating
+variables.
+
+Support separate configurations for:
+
+-   Local development.
+-   Automated testing.
+-   Staging.
+-   Production.
+
+Manage:
+
+-   PostgreSQL connection settings.
+-   Authentication secrets.
+-   Payment provider credentials.
+-   Webhook secrets.
+-   Frontend API configuration.
+-   Application environment.
+-   Logging configuration.
+-   Billing job configuration.
+
+Never expose private backend secrets in React environment variables.
+
+Validate required configuration at backend startup and fail clearly if
+essential production configuration is missing.
+
+Do not silently fall back to insecure production defaults.
+
+------------------------------------------------------------------------
+
+## 25. ERROR HANDLING AND RECOVERY
+
+Implement consistent error handling across the application.
+
+Examples of meaningful business errors:
+
+-   `UNAUTHORIZED`
+-   `FORBIDDEN`
+-   `TENANT_ACCESS_DENIED`
+-   `TENANT_NOT_FOUND`
+-   `PRICING_NOT_CONFIGURED`
+-   `PRICING_CONFIGURATION_INVALID`
+-   `PRICING_COVERAGE_MISSING`
+-   `BILLING_PERIOD_INVALID`
+-   `DUPLICATE_USAGE`
+-   `DUPLICATE_INVOICE`
+-   `PAYMENT_FAILED`
+-   `INVALID_WEBHOOK_SIGNATURE`
+-   `SUBSCRIPTION_NOT_ACTIVE`
+
+Return appropriate HTTP status codes.
+
+Do not expose internal exception details to end users.
+
+Implement retry-safe background jobs and ensure interrupted billing
+operations can recover without duplicate charges.
+
+------------------------------------------------------------------------
+
+## 26. DOCUMENTATION AND HANDOVER
+
+Prepare complete technical documentation.
+
+Include:
+
+1.  Architecture overview.
+2.  System component diagram.
+3.  Database ER diagram.
+4.  Table documentation.
+5.  Tenant isolation strategy.
+6.  Authentication and authorization flow.
+7.  Procedure execution flow.
+8.  Pricing configuration guide.
+9.  Graduated/Tiered pricing calculation explanation.
+10. Volume pricing calculation explanation.
+11. Usage-based billing workflow.
+12. Invoice generation workflow.
+13. Payment integration workflow.
+14. Subscription management.
+15. API documentation.
+16. Environment variable documentation.
+17. Database migration instructions.
+18. Docker build and run instructions.
+19. Azure DevOps deployment instructions.
+20. Rollback and recovery procedures.
+21. Test execution instructions.
+22. Troubleshooting guide.
+
+Provide example pricing calculations as documentation only. Never use
+those examples as fixed production pricing.
+
+------------------------------------------------------------------------
+
+## 27. REQUIRED DEVELOPMENT PHASES
+
+Implement the solution in controlled phases.
+
+Do not attempt to modify the entire application in one uncontrolled
+change.
+
+### Phase 1 -- Existing Project Analysis
+
+-   Inspect the full repository.
+-   Inspect the existing database.
+-   Identify reusable functionality.
+-   Document the current architecture.
+-   Identify missing capabilities.
+-   Present the risk assessment.
+
+**Deliverable:** Existing architecture and gap analysis.
+
+### Phase 2 -- Architecture and Database Design
+
+-   Design tenant relationships.
+-   Design user membership and permissions.
+-   Design tenant-specific pricing.
+-   Design procedure usage tracking.
+-   Design billing and invoice relationships.
+-   Design payment and subscription integration.
+-   Prepare the ER diagram.
+-   Prepare migration scripts.
+
+**Deliverable:** Approved architecture and database migration plan.
+
+### Phase 3 -- Authentication and Tenant Security
+
+-   Implement or extend membership validation.
+-   Implement tenant context.
+-   Implement role and permission checks.
+-   Implement tenant-scoped database access.
+-   Test cross-tenant security.
+
+**Deliverable:** Secure multi-tenant foundation.
+
+### Phase 4 -- Configurable Pricing Management
+
+-   Build Super Admin pricing configuration.
+-   Implement dynamic pricing slabs.
+-   Implement calculation method selection.
+-   Implement effective dates.
+-   Implement pricing validation.
+-   Implement pricing preview.
+-   Implement historical pricing.
+
+**Deliverable:** Fully configurable tenant-specific pricing management.
+
+### Phase 5 -- Procedure Usage Tracking
+
+-   Integrate with the existing procedure execution flow.
+-   Record execution lifecycle.
+-   Implement billable eligibility.
+-   Implement idempotency.
+-   Separate actual usage from billable usage.
+
+**Deliverable:** Reliable procedure usage tracking.
+
+### Phase 6 -- Billing Engine
+
+-   Implement tenant-specific pricing resolution.
+-   Implement graduated calculations.
+-   Implement volume calculations.
+-   Implement billing-period aggregation.
+-   Implement pricing snapshots.
+-   Implement duplicate billing prevention.
+
+**Deliverable:** Authoritative usage-based billing engine.
+
+### Phase 7 -- Invoice Management
+
+-   Implement invoice generation.
+-   Implement invoice item breakdown.
+-   Implement payment allocation.
+-   Implement invoice status.
+-   Implement immutable finalized invoices.
+-   Implement adjustments.
+
+**Deliverable:** Complete billing and invoice workflow.
+
+### Phase 8 -- Payment and Subscription Integration
+
+-   Extend the existing payment provider integration.
+-   Implement webhook verification.
+-   Implement payment event deduplication.
+-   Implement payment reconciliation.
+-   Extend subscription functionality.
+
+**Deliverable:** Complete payment and subscription workflow.
+
+### Phase 9 -- Dashboards and Frontend
+
+-   Implement Super Admin dashboard.
+-   Implement tenant management.
+-   Implement pricing UI.
+-   Implement Tenant Admin dashboard.
+-   Implement usage and billing screens.
+-   Implement invoice and payment screens.
+
+**Deliverable:** Complete React + TypeScript user experience.
+
+### Phase 10 -- Testing and Security Validation
+
+-   Run unit tests.
+-   Run integration tests.
+-   Run multi-tenant security tests.
+-   Run pricing tests.
+-   Run billing tests.
+-   Run payment tests.
+-   Run end-to-end tests.
+
+**Deliverable:** Test reports and resolved defects.
+
+### Phase 11 -- Deployment Preparation
+
+-   Validate migrations.
+-   Validate Docker builds.
+-   Validate environment configuration.
+-   Validate Azure DevOps pipelines.
+-   Validate health checks.
+-   Prepare deployment and recovery instructions.
+
+**Deliverable:** Production-ready deployment package.
+
+### Phase 12 -- Production Deployment
+
+Only after explicit approval:
+
+-   Take and verify a database backup.
+-   Run approved migrations.
+-   Deploy backend.
+-   Deploy frontend.
+-   Run smoke tests.
+-   Verify payment and billing workflows.
+-   Verify tenant isolation.
+-   Monitor application health.
+
+**Deliverable:** Verified production deployment.
+
+------------------------------------------------------------------------
+
+## 28. NON-NEGOTIABLE DEVELOPMENT RULES
+
+1.  This is an existing project, not a new application.
+2.  Inspect before modifying.
+3.  Preserve existing working functionality.
+4.  Reuse existing database tables wherever possible.
+5.  Reuse existing authentication.
+6.  Reuse existing payment integration.
+7.  Reuse existing procedure execution logic.
+8.  Do not introduce duplicate ORM or migration frameworks.
+9.  Never delete production data.
+10. Never reset the production database.
+11. Never overwrite applied migrations.
+12. Never hardcode tenant pricing.
+13. Never assume standard pricing slabs.
+14. Never apply one tenant's pricing to another tenant.
+15. Never silently apply global default pricing.
+16. Never calculate authoritative financial amounts in the frontend.
+17. Never trust frontend payment status.
+18. Never allow cross-tenant data access.
+19. Never create duplicate usage charges.
+20. Never create duplicate invoices.
+21. Never change historical billing when pricing changes.
+22. Never expose payment secrets.
+23. Never deploy unapproved destructive database changes.
+24. Never mark a task complete without testing it.
+25. Never claim successful deployment without verification.
+
+------------------------------------------------------------------------
+
+## 29. FINAL ACCEPTANCE CRITERIA
+
+The project is complete only when all the following conditions are
+satisfied.
+
+### Multi-tenant architecture
+
+-   Multiple tenants operate independently.
+-   Tenant data is isolated.
+-   Users can belong to multiple tenants.
+-   Role and permission enforcement works correctly.
+
+### Configurable pricing
+
+-   Every tenant can have completely different pricing.
+-   Super Admin can create any number of pricing slabs.
+-   Pricing can vary by procedure category.
+-   Graduated and Volume methods work correctly.
+-   Currency and billing periods are configurable.
+-   Effective dates and pricing history work correctly.
+-   No fixed or global pricing is assumed.
+-   Missing pricing prevents incorrect billing.
+
+### Procedure usage
+
+-   Existing execution workflow remains functional.
+-   Executions are tracked accurately.
+-   Billable and non-billable counts are separate.
+-   Duplicate execution and billing requests are handled safely.
+
+### Billing and invoices
+
+-   Correct tenant-specific slabs are applied.
+-   Calculations use exact decimal arithmetic.
+-   Pricing snapshots are preserved.
+-   Invoices contain transparent calculation breakdowns.
+-   Duplicate invoices are prevented.
+-   Historical invoices remain immutable.
+
+### Payments and subscriptions
+
+-   Existing payment integration works.
+-   Webhooks are verified.
+-   Duplicate payment events are prevented.
+-   Partial and full payments are tracked correctly.
+-   Subscription history is preserved.
+
+### Frontend
+
+-   Super Admin can manage all authorized tenant configurations.
+-   Tenant Admin sees only their own information.
+-   Pricing slabs are dynamically displayed.
+-   Pricing previews match backend calculations.
+-   Billing and invoice information is accurate.
+
+### Deployment
+
+-   Database migrations are safe.
+-   Docker builds successfully.
+-   Azure DevOps pipeline succeeds.
+-   Health checks pass.
+-   Application functions correctly after deployment.
+
+------------------------------------------------------------------------
+
+## 30. FIRST ACTION -- DO NOT START CODING IMMEDIATELY
+
+Start by inspecting my existing AIQMate repository and database.
+
+Do not create or modify any files during the initial analysis.
+
+First provide:
+
+1.  Current architecture findings.
+2.  Existing database schema and ER diagram.
+3.  Existing procedure execution flow.
+4.  Existing payment and subscription flow.
+5.  Existing authentication and tenant security implementation.
+6.  Missing tables and functionality.
+7.  Required database modifications.
+8.  Proposed tenant-specific pricing design.
+9.  Proposed backend API architecture.
+10. Proposed React frontend changes.
+11. Migration strategy.
+12. Deployment strategy.
+13. Potential risks and compatibility issues.
+14. Phase-by-phase implementation plan.
+
+Clearly identify which functionality already exists, which functionality
+needs modification, and which functionality is genuinely missing.
+
+Do not assume anything without inspecting the actual code and database.
+
+**Wait for my approval before starting implementation.**
+
+After approval, implement one phase at a time, test each phase, document
+the changes, and report any risks before proceeding.
+
+The ultimate objective is a fully integrated, secure, tenant-isolated,
+independently configurable, financially accurate, scalable, and
+production-ready AIQMate SaaS application that can be deployed and
+maintained without unnecessary migration conflicts, data loss, duplicate
+billing, cross-tenant security issues, or avoidable deployment delays.
